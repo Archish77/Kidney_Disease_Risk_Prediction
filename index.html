@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kidney Health AI Predictor</title>
+    <style>
+        :root { --primary: #2c3e50; --secondary: #27ae60; --danger: #e74c3c; --light: #ecf0f1; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; color: var(--primary); }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; border-bottom: 2px solid var(--secondary); padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 5px; font-size: 0.9em; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        input:focus { border-color: var(--secondary); outline: none; }
+        button { grid-column: span 2; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        button:hover { background: #219150; transform: translateY(-2px); }
+        #result-box { margin-top: 30px; padding: 20px; border-radius: 10px; text-align: center; display: none; font-size: 1.2em; font-weight: bold; }
+        .high-risk { background: #ffdada; color: var(--danger); border: 1px solid var(--danger); }
+        .low-risk { background: #d4edda; color: var(--secondary); border: 1px solid var(--secondary); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Kidney Disease Risk Predictor</h1>
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="Age" placeholder="e.g. 45">
+        </div>
+        <div class="form-group">
+            <label>Gender</label>
+            <select id="Gender"><option value="1">Male</option><option value="0">Female</option></select>
+        </div>
+        <div class="form-group">
+            <label>Water Intake (Liters/Day)</label>
+            <input type="number" step="0.1" id="Water_Intake_Liters" placeholder="e.g. 2.5">
+        </div>
+        <div class="form-group">
+            <label>Urination Frequency</label>
+            <input type="number" id="Urination_Frequency" placeholder="Times per day">
+        </div>
+        <div class="form-group">
+            <label>Physical Activity</label>
+            <select id="Physical_Activity_Level"><option value="0">Low</option><option value="1">Moderate</option><option value="2">High</option></select>
+        </div>
+        <div class="form-group">
+            <label>Sitting Hours</label>
+            <input type="number" id="Sitting_Hours" placeholder="Hours per day">
+        </div>
+        <div class="form-group">
+            <label>Salt Intake Level</label>
+            <select id="Salt_Intake_Level"><option value="0">Low</option><option value="1">Medium</option><option value="2">High</option></select>
+        </div>
+        <div class="form-group">
+            <label>Protein Intake</label>
+            <select id="Protein_Intake"><option value="0">Normal</option><option value="1">High</option></select>
+        </div>
+        <div class="form-group">
+            <label>Sleep Hours</label>
+            <input type="number" id="Sleep_Hours" placeholder="Hours per night">
+        </div>
+        <div class="form-group">
+            <label>Smoking</label>
+            <select id="Smoking"><option value="0">No</option><option value="1">Yes</option></select>
+        </div>
+        <div class="form-group">
+            <label>Alcohol</label>
+            <select id="Alcohol"><option value="0">No</option><option value="1">Yes</option></select>
+        </div>
+        <div class="form-group">
+            <label>BP Level</label>
+            <select id="BP_Level"><option value="0">Normal</option><option value="1">High</option></select>
+        </div>
+        <div class="form-group">
+            <label>Diabetes</label>
+            <select id="Diabetes"><option value="0">No</option><option value="1">Yes</option></select>
+        </div>
+
+        <button onclick="submitData()">Predict Now</button>
+    </div>
+
+    <div id="result-box"></div>
+</div>
+
+<script>
+    async function submitData() {
+        const ids = [
+            'Age', 'Gender', 'Water_Intake_Liters', 'Urination_Frequency', 
+            'Physical_Activity_Level', 'Sitting_Hours', 'Salt_Intake_Level', 
+            'Protein_Intake', 'Sleep_Hours', 'Smoking', 'Alcohol', 'BP_Level', 'Diabetes'
+        ];
+        
+        const data = {};
+        ids.forEach(id => {
+            const val = document.getElementById(id).value;
+            data[id] = val === "" ? 0 : val;
+        });
+
+        const resBox = document.getElementById('result-box');
+        resBox.style.display = 'block';
+        resBox.innerText = "Analyzing...";
+        resBox.className = "";
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            
+            resBox.innerText = result.prediction;
+            resBox.classList.add(result.prediction.includes("High") ? 'high-risk' : 'low-risk');
+        } catch (error) {
+            resBox.innerText = "Not Connectes to the server";
+        }
+    }
+</script>
+
+</body>
+</html>
