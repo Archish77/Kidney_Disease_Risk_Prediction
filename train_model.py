@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import pickle
 
-# 1. Data Load karein
+
 df = pd.read_csv('Kidney_Disease.csv')
 
 mappings = {
@@ -34,5 +34,6 @@ print(f"Model Accuracy: {accuracy_score(y_test, y_pred) * 100:.2f}%")
 
 with open('model.pkl', 'wb') as f:
     pickle.dump(model, f)
+
 
 print("Model saved as model.pkl")
